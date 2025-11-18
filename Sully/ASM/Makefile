@@ -1,5 +1,5 @@
-NAME := Colleen
-SRCS := Colleen.s
+NAME := Sully
+SRCS := Sully.s
 NASM := nasm
 NASMFLAGS := -felf64 -g
 CC := cc
