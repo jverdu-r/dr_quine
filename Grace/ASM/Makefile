@@ -11,11 +11,8 @@ OBJS := $(SRCS:.s=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(CC) $(OBJS) $(LD_FLAGS) -o $(NAME)
-
-%.o: %.s
-	$(NASM) $(NASMFLAGS) -o $@ $<
+$(NAME): $(SRCS)
+	$(NASM) $(NASMFLAGS) -o $(NAME).o $(SRCS) && $(CC) $(NAME).o $(LD_FLAGS) -o $(NAME)
 
 clean:
 	$(RM) $(OBJS) Grace_kid.s
