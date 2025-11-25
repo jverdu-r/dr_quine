@@ -6,6 +6,7 @@ section .data
     mode_w db "w", 0
     compile_cmd db "nasm -felf64 -g -o Sully_%d.o Sully_%d.s && gcc -no-pie Sully_%d.o -o Sully_%d", 0
     run_cmd db "./Sully_%d", 0
+    original_name db "Sully", 0
 
 section .text
     global main
@@ -23,9 +24,7 @@ main:
     sub rsp, 64
 
     mov eax, 5
-    dec eax
-    cmp eax, 0
-    jl exit_process
+    ; Don't decrement for original - create Sully_5.s
     mov r12, rax
 
     ; Create filename
@@ -43,13 +42,13 @@ main:
     jz exit_process
     mov rbx, rax
 
-    ; Write source to file
+    ; Write source to file with filename value
     mov rdi, rbx
     lea rsi, [rel model]
     mov rdx, 10
     mov rcx, 34
     lea r8, [rel model]
-    mov r9, r12  ; Use the decremented value (same as filename)
+    mov r9, r12         ; Use filename value (5 for Sully_5.s)
     xor rax, rax
     call fprintf wrt ..plt
 
