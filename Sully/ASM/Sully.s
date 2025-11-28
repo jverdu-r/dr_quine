@@ -1,90 +1,72 @@
-BITS 64
-
-section .data
-    model db "BITS 64%1$c%1$csection .data%1$c    model db %2$c%3$s%2$c, 0%1$c    filename db %2$cSully_%4$d.s%2$c, 0%1$c    mode_w db %2$cw%2$c, 0%1$c    compile_cmd db %2$cnasm -felf64 -g -o Sully_%4$d.o Sully_%4$d.s && gcc -no-pie Sully_%4$d.o -o Sully_%4$d%2$c, 0%1$c    run_cmd db %2$c./Sully_%4$d%2$c, 0%1$c%1$csection .text%1$c    global main%1$c    extern fopen%1$c    extern fclose%1$c    extern fprintf%1$c    extern system%1$c    extern sprintf%1$c%1$cmain:%1$c    push rbp%1$c    mov rbp, rsp%1$c    push rbx%1$c    push r12%1$c    sub rsp, 64%1$c%1$c    mov eax, %4$d%1$c    dec eax%1$c    cmp eax, 0%1$c    jl exit_process%1$c    mov r12, rax%1$c%1$c    ; Create filename%1$c    lea rdi, [rsp]%1$c    lea rsi, [rel filename]%1$c    mov rdx, r12%1$c    xor rax, rax%1$c    call sprintf wrt ..plt%1$c%1$c    ; Open file%1$c    lea rdi, [rsp]%1$c    lea rsi, [rel mode_w]%1$c    call fopen wrt ..plt%1$c    test rax, rax%1$c    jz exit_process%1$c    mov rbx, rax%1$c%1$c    ; Write source to file%1$c    mov rdi, rbx%1$c    lea rsi, [rel model]%1$c    mov rdx, 10%1$c    mov rcx, 34%1$c    lea r8, [rel model]%1$c    mov r9, r12%1$c    xor rax, rax%1$c    call fprintf wrt ..plt%1$c%1$c    ; Close file%1$c    mov rdi, rbx%1$c    call fclose wrt ..plt%1$c%1$c    ; Create compile command%1$c    lea rdi, [rsp+32]%1$c    lea rsi, [rel compile_cmd]%1$c    mov rdx, r12%1$c    mov rcx, r12%1$c    mov r8, r12%1$c    mov r9, r12%1$c    xor rax, rax%1$c    call sprintf wrt ..plt%1$c%1$c    ; Execute compile%1$c    lea rdi, [rsp+32]%1$c    call system wrt ..plt%1$c%1$c    ; Create run command%1$c    lea rdi, [rsp+32]%1$c    lea rsi, [rel run_cmd]%1$c    mov rdx, r12%1$c    xor rax, rax%1$c    call sprintf wrt ..plt%1$c%1$c    ; Execute program%1$c    lea rdi, [rsp+32]%1$c    call system wrt ..plt%1$c%1$cexit_process:%1$c    add rsp, 64%1$c    pop r12%1$c    pop rbx%1$c    pop rbp%1$c    xor eax, eax%1$c    ret%1$c", 0
-    filename db "Sully_%d.s", 0
-    mode_w db "w", 0
-    compile_cmd db "nasm -felf64 -g -o Sully_%d.o Sully_%d.s && gcc -no-pie Sully_%d.o -o Sully_%d", 0
-    run_cmd db "./Sully_%d", 0
-    original_name db "Sully", 0
-
+section .rodata
+s db "Sully_%d.s", 0
+w db "w", 0
+f db "section .rodata%cs db %cSully_%%d.s%c, 0%cw db %cw%c, 0%cf db %c%s%c, 0%cc db %cSULLY=Sully_%%d; nasm -felf64 $SULLY.s -o $SULLY.o; gcc -lc $SULLY.o -o $SULLY; ./$SULLY%c, 0%ci dq %d%csection .text%cglobal main%cextern snprintf%cextern printf%cextern exit%cextern fopen%cextern fclose%cextern fprintf%cextern system%cmain:%ccmp byte [rel i], 0%cje .end%csub rsp, 24%clea rdi, [rsp]%cmov rsi, 16%clea rdx, [rel s]%cmov rcx, [rel i]%cdec rcx%ccall snprintf wrt ..plt%clea rdi, [rsp]%clea rsi, [rel w]%ccall fopen wrt ..plt%csub rsp, 576%cmov rbx, rax%cmov rdi, rbx%clea rsi, [rel f]%cmov rdx, 10%cmov r8, 34%cmov r9, 10%cmov ecx, 71%c.push_loop:%cpush 10%cdec ecx%cjnz .push_loop%cmov rcx, [rel i]%cdec rcx%cpush rcx%cpush 10%cpush 34%cpush 34%cpush 10%cpush 34%clea rcx, [rel f]%cpush rcx%cpush 34%cpush 10%cpush 34%cpush 34%cmov rcx, 34%ccall fprintf wrt ..plt%cmov rdi, rbx%ccall fclose wrt ..plt%csub rsp, 96%clea rdi, [rsp]%cmov rsi, 96%clea rdx, [rel c]%cmov rcx, [rel i]%cdec rcx%ccall snprintf wrt ..plt%clea rdi, [rsp]%ccall system wrt ..plt%cadd rsp, 24%cjmp .end%c.end:%cmov rdi, 0%ccall exit wrt ..plt%c", 0
+c db "SULLY=Sully_%d; nasm -felf64 $SULLY.s -o $SULLY.o; gcc -lc $SULLY.o -o $SULLY; ./$SULLY", 0
+i dq 5
 section .text
-    global main
-    extern fopen
-    extern fclose
-    extern fprintf
-    extern system
-    extern sprintf
-
+global main
+extern snprintf
+extern printf
+extern exit
+extern fopen
+extern fclose
+extern fprintf
+extern system
 main:
-    push rbp
-    mov rbp, rsp
-    push rbx
-    push r12
-    sub rsp, 64
-
-    mov eax, 5
-    ; Don't decrement for original - create Sully_5.s
-    mov r12, rax
-
-    ; Create filename
-    lea rdi, [rsp]
-    lea rsi, [rel filename]
-    mov rdx, r12
-    xor rax, rax
-    call sprintf wrt ..plt
-
-    ; Open file
-    lea rdi, [rsp]
-    lea rsi, [rel mode_w]
-    call fopen wrt ..plt
-    test rax, rax
-    jz exit_process
-    mov rbx, rax
-
-    ; Write source to file with filename value
-    mov rdi, rbx
-    lea rsi, [rel model]
-    mov rdx, 10
-    mov rcx, 34
-    lea r8, [rel model]
-    mov r9, r12         ; Use filename value (5 for Sully_5.s)
-    xor rax, rax
-    call fprintf wrt ..plt
-
-    ; Close file
-    mov rdi, rbx
-    call fclose wrt ..plt
-
-    ; Create compile command
-    lea rdi, [rsp+32]
-    lea rsi, [rel compile_cmd]
-    mov rdx, r12
-    mov rcx, r12
-    mov r8, r12
-    mov r9, r12
-    xor rax, rax
-    call sprintf wrt ..plt
-
-    ; Execute compile
-    lea rdi, [rsp+32]
-    call system wrt ..plt
-
-    ; Create run command
-    lea rdi, [rsp+32]
-    lea rsi, [rel run_cmd]
-    mov rdx, r12
-    xor rax, rax
-    call sprintf wrt ..plt
-
-    ; Execute program
-    lea rdi, [rsp+32]
-    call system wrt ..plt
-
-exit_process:
-    add rsp, 64
-    pop r12
-    pop rbx
-    pop rbp
-    xor eax, eax
-    ret
+cmp byte [rel i], 0
+je .end
+sub rsp, 24
+lea rdi, [rsp]
+mov rsi, 16
+lea rdx, [rel s]
+mov rcx, [rel i]
+; Don't decrement for original - use full value for filename
+call snprintf wrt ..plt
+lea rdi, [rsp]
+lea rsi, [rel w]
+call fopen wrt ..plt
+sub rsp, 576
+mov rbx, rax
+mov rdi, rbx
+lea rsi, [rel f]
+mov rdx, 10
+mov r8, 34
+mov r9, 10
+mov ecx, 71
+.push_loop:
+push 10
+dec ecx
+jnz .push_loop
+mov rcx, [rel i]
+; Use original value for content, not decremented  
+push rcx
+push 10
+push 34
+push 34
+push 10
+push 34
+lea rcx, [rel f]
+push rcx
+push 34
+push 10
+push 34
+push 34
+mov rcx, 34
+call fprintf wrt ..plt
+mov rdi, rbx
+call fclose wrt ..plt
+sub rsp, 96
+lea rdi, [rsp]
+mov rsi, 96
+lea rdx, [rel c]
+mov rcx, [rel i]
+; Use original value for command generation
+call snprintf wrt ..plt
+lea rdi, [rsp]
+call system wrt ..plt
+add rsp, 24
+jmp .end
+.end:
+mov rdi, 0
+call exit wrt ..plt
