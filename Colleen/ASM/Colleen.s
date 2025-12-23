@@ -1,41 +1,31 @@
+; One Comment
+BITS 64
+
 section .data
-    data: db "section .data%c    data: db %c%s%c, 0%c%csection .text%cglobal main%cextern printf%c%cprintout:%c    push rbp%c    mov rbp, rsp%c    lea rdi, [rel data]%c    mov rsi, 10%c    mov rdx, 34%c    lea rcx, [rel data]%c    mov r8, 34%c    mov r9, 10%c    sub rsp, 48%c    mov qword [rsp+40], 10%c    mov qword [rsp+32], 47%c    mov qword [rsp+24], 10%c    mov qword [rsp+16], 10%c    mov qword [rsp+8], 47%c    mov qword [rsp], 10%c    mov rax, 0%c    call printf wrt ..plt%c    add rsp, 48%c    mov rsp, rbp%c    pop rbp%c    ret%c%c; comment outside%c%cmain:%c; comment in main%c    push rbp%c    mov rbp, rsp%c    call printout%c    mov rsp, rbp%c    pop rbp%c    xor eax, eax%c    ret%c", 0
+    model db "; One Comment%1$cBITS 64%1$c%1$csection .data%1$c    model db %2$c%3$s%2$c, 0%1$c%1$csection .text%1$c    global main%1$c    extern printf%1$c%1$c%4$cmacro FT 0%1$cmain:%1$c    push rbp%1$c    mov rbp, rsp%1$c%1$c    write_to_stdout:%1$c        lea rdi, [rel model]%1$c        mov rsi, 10%1$c        mov rdx, 34%1$c        lea rcx, [rel model]%1$c        mov r8, 37%1$c        xor rax, rax%1$c        call printf wrt ..plt%1$c%1$c    exit_process:%1$c        pop rbp%1$c        xor eax, eax%1$c        ret%1$c%4$cendmacro%1$c%1$cFT%1$c", 0
 
 section .text
-global main
-extern printf
+    global main
+    extern printf
 
-printout:
-    push rbp
-    mov rbp, rsp
-    lea rdi, [rel data]
-    mov rsi, 10
-    mov rdx, 34
-    lea rcx, [rel data]
-    mov r8, 34
-    mov r9, 10
-    sub rsp, 48
-    mov qword [rsp+40], 10
-    mov qword [rsp+32], 47
-    mov qword [rsp+24], 10
-    mov qword [rsp+16], 10
-    mov qword [rsp+8], 47
-    mov qword [rsp], 10
-    mov rax, 0
-    call printf wrt ..plt
-    add rsp, 48
-    mov rsp, rbp
-    pop rbp
-    ret
-
-; comment outside
-
+%macro FT 0
 main:
-; comment in main
     push rbp
     mov rbp, rsp
-    call printout
-    mov rsp, rbp
-    pop rbp
-    xor eax, eax
-    ret
+
+    write_to_stdout:
+        lea rdi, [rel model]
+        mov rsi, 10
+        mov rdx, 34
+        lea rcx, [rel model]
+        mov r8, 37
+        xor rax, rax
+        call printf wrt ..plt
+
+    exit_process:
+        pop rbp
+        xor eax, eax
+        ret
+%endmacro
+
+FT

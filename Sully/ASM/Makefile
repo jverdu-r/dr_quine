@@ -12,7 +12,7 @@ OBJS := $(SRCS:.s=.o)
 all: $(NAME)
 
 $(NAME): $(SRCS)
-	$(NASM) $(NASMFLAGS) -o $(NAME).o $(SRCS) && $(CC) -no-pie $(NAME).o $(LD_FLAGS) -o $(NAME)
+	$(NASM) $(NASMFLAGS) -o $(NAME).o $(SRCS) && $(CC) $(NAME).o $(LD_FLAGS) -o $(NAME)
 
 clean:
 	$(RM) $(OBJS)
