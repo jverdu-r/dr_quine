@@ -2,7 +2,7 @@ NAME := Colleen
 SRCS := Colleen.s
 NASM := nasm
 NASMFLAGS := -felf64 -g
-CC := cc
+CC := gcc
 LD_FLAGS := -Wl,-z,noexecstack
 RM := rm -f
 OBJS := $(SRCS:.s=.o)
